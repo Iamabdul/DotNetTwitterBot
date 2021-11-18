@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TwitterBot.Core.Helpers;
 
-namespace TwitterBot.Core.Clients
+namespace TwitterBot.Core.Clients.Twitter
 {
     public interface ITwitterClient
     {
@@ -16,7 +17,7 @@ namespace TwitterBot.Core.Clients
 
     public class TwitterClient : ITwitterClient
     {
-        readonly HttpClient _httpClient;
+        protected readonly HttpClient _httpClient;
 
         public TwitterClient()
         {
@@ -26,13 +27,13 @@ namespace TwitterBot.Core.Clients
 
         public Task<Stream> Get(string path)
         {
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ConfigurationManager.AppSettings["Twitter:BearerToken"]}");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer" ,$"{ConfigurationManager.AppSettings["Twitter:BearerToken"]}");
             return _httpClient.GetStreamAsync(path);
         }
 
         public async Task<HttpResponseMessage> Post(string path, object body)
         {
-            _httpClient.DefaultRequestHeaders.Add("Authorization", OAuthRequestHelper.PrepareOAuth1Request(_httpClient.BaseAddress.AbsoluteUri + path));
+            _httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(OAuthRequestHelper.PrepareOAuth1Request(_httpClient.BaseAddress.AbsoluteUri + path));
             var stringContent = new StringContent(JsonSerializer.Serialize(body, TwitterJsonSettings.Options), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(path, stringContent);
 
@@ -47,7 +48,7 @@ namespace TwitterBot.Core.Clients
             var stringError = await response.Content.ReadAsStringAsync();
             throw new Exception(stringError);
         }
-    }
+    }    
 
     public class TwitterErrorDTO
     {

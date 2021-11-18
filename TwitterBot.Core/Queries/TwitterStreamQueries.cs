@@ -2,15 +2,16 @@
 using System.IO;
 using System.Threading.Tasks;
 using TwitterBot.Core.Clients;
+using TwitterBot.Core.Clients.Twitter;
 
 namespace TwitterBot.Queries
 {
-    public interface IStreamQueries
+    public interface ITwitterStreamQueries
     {
         Task GetFilteredStream(Action<string> twitterStreamActivated);
     }
 
-    public class TwitterStreamQueries : IStreamQueries
+    public class TwitterStreamQueries : ITwitterStreamQueries
     {
         readonly ITwitterClient _twitterClient;
         
@@ -19,7 +20,7 @@ namespace TwitterBot.Queries
             _twitterClient = twitterClient;
         }
 
-        public async Task GetFilteredStream(Action<string> twitterStreamActivated)
+        public async Task GetFilteredStream(Action<string> processResult)
         {
             var result = await _twitterClient.Get("tweets/search/stream?expansions=author_id");
 
@@ -29,7 +30,9 @@ namespace TwitterBot.Queries
                 {
                     while (!reader.EndOfStream)
                     {
-                        twitterStreamActivated.Invoke(reader.ReadLine());
+                        var readableString = reader.ReadLine();
+                        if(readableString.Length > 0)
+                            processResult.Invoke(readableString);
                     }
                 }
                 catch (Exception ex)
