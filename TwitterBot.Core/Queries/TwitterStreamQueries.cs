@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using TwitterBot.Core.Clients;
 using TwitterBot.Core.Clients.Twitter;
 
 namespace TwitterBot.Queries
