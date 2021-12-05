@@ -1,32 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using TwitterBot.Core.Clients.Twitter;
-using TwitterBot.Core.Commands;
-using TwitterBot.Core.Services;
-using TwitterBot.Queries;
+﻿using TwitterBot.Core.Helpers;
+using TwitterBot.Helpers;
 
-namespace TwitterBot
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+var builder = WebApplication.CreateBuilder(args);
 
-        static IHostBuilder CreateHostBuilder(string[] args)
-            => Host.CreateDefaultBuilder(args)
-                   .ConfigureServices((hostBuilderContext, services) =>
-                   {
-                       //singletons
-                       services.AddSingleton<ITwitterStreamQueries, TwitterStreamQueries>();
-                       services.AddSingleton<IRetweetCommand, RetweetCommand>();
+//Configuring services
+builder.Services.ConfigureTwitterBotServices(); //extension
 
-                       //transients
-                       services.AddTransient<ITwitterClient, TwitterClient>();
+var app = builder.Build();
 
-                       //Hosted services, could probably add other social network APIs soon
-                       services.AddHostedService<TwitterStreamService>();
-                   });
-    }
-}
+//Endpoints to expose
+app.MapEndpoints(); //extension
+
+app.Run();

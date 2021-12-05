@@ -1,4 +1,4 @@
-﻿namespace TwitterBot.Core.Models.Twitter
+﻿namespace TwitterBot.Core.Models
 {
     public class StreamTweet
     {

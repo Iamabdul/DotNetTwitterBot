@@ -1,12 +1,12 @@
-﻿using System.Text.Json;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using TwitterBot.Core.Commands;
 using TwitterBot.Core.Helpers;
-using TwitterBot.Core.Models.Twitter;
-using TwitterBot.Queries;
+using TwitterBot.Core.Models;
+using TwitterBot.Core.Queries;
 
 namespace TwitterBot.Core.Services
 {

@@ -1,37 +1,48 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace TwitterBot.Core.Helpers
 {
-    public static class OAuthRequestHelper
+    public interface IOAuthRequestHelper
     {
-        readonly static string _consumerKey;
-        readonly static string _consumerKeySecret;
-        readonly static string _accessToken;
-        readonly static string _accessTokenSecret;
-        readonly static HMACSHA1 _sigHasher;
-        readonly static DateTime _epochUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        AuthenticationHeaderValue GetBearerToken();
+        string PrepareOAuth1Request(string URL);
+    }
 
-        static OAuthRequestHelper()
+    public class OAuthRequestHelper : IOAuthRequestHelper
+    {
+        private readonly AuthenticationHeaderValue _bearerToken;
+        private readonly string _consumerKey;
+        private readonly string _accessToken;
+        private readonly HMACSHA1 _sigHasher;
+        private readonly DateTime _epochUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        public OAuthRequestHelper(IConfiguration configuration)
         {
-            _consumerKey = ConfigurationManager.AppSettings["Twitter:ApiKey"];
-            _consumerKeySecret = ConfigurationManager.AppSettings["Twitter:ApiSecret"];
-            _accessToken = ConfigurationManager.AppSettings["Twitter:AccessToken"];
-            _accessTokenSecret = ConfigurationManager.AppSettings["Twitter:AccessTokenSecret"];
+            _bearerToken = new AuthenticationHeaderValue("Bearer", $"{configuration["Twitter:BearerToken"]}");
+            _consumerKey = configuration["Twitter:ApiKey"];
+            _accessToken = configuration["Twitter:AccessToken"];
+
+            var consumerKeySecret = configuration["Twitter:ApiSecret"];
+            var accessTokenSecret = configuration["Twitter:AccessTokenSecret"];
 
             _sigHasher = new HMACSHA1(
-                Encoding.UTF8.GetBytes($"{_consumerKeySecret}&{_accessTokenSecret}")
+                Encoding.UTF8.GetBytes($"{consumerKeySecret}&{accessTokenSecret}")
             );
         }
 
-        public static string PrepareOAuth1Request(string URL)
+        public AuthenticationHeaderValue GetBearerToken() => _bearerToken;
+
+        public string PrepareOAuth1Request(string URL)
         {
             // seconds passed since 1/1/1970
-            var timestamp = (int)((DateTime.UtcNow - _epochUtc).TotalSeconds);
+            var timestamp = (int)(DateTime.UtcNow - _epochUtc).TotalSeconds;
 
             // Add all the OAuth headers we'll need to use when constructing the hash
             Dictionary<string, string> oAuthData = new Dictionary<string, string>();
@@ -49,7 +60,7 @@ namespace TwitterBot.Core.Helpers
             return GenerateOAuthHeader(oAuthData);
         }
 
-        static string GenerateSignature(string url, Dictionary<string, string> data)
+        private string GenerateSignature(string url, Dictionary<string, string> data)
         {
             var sigString = string.Join(
                 "&",
@@ -73,7 +84,7 @@ namespace TwitterBot.Core.Helpers
             );
         }
 
-        static string GenerateOAuthHeader(Dictionary<string, string> data)
+        private static string GenerateOAuthHeader(Dictionary<string, string> data)
         {
             return string.Format(
                 "OAuth {0}",
