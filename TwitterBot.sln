@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31402.337
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterBot", "TwitterBot\TwitterBot.csproj", "{CDFB23EE-7314-4D70-9ED0-118939A88F57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitterBot", "TwitterBot\TwitterBot.csproj", "{CDFB23EE-7314-4D70-9ED0-118939A88F57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterBot.Core", "TwitterBot.Core\TwitterBot.Core.csproj", "{3E7ECDAE-805D-4C17-AE71-12943F029937}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitterBot.Core", "TwitterBot.Core\TwitterBot.Core.csproj", "{3E7ECDAE-805D-4C17-AE71-12943F029937}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

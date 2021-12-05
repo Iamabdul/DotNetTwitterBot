@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using TwitterBot.Core.Clients.Twitter;
+using TwitterBot.Core.Clients;
 
-namespace TwitterBot.Queries
+namespace TwitterBot.Core.Queries
 {
     public interface ITwitterStreamQueries
     {
@@ -12,31 +12,24 @@ namespace TwitterBot.Queries
 
     public class TwitterStreamQueries : ITwitterStreamQueries
     {
-        readonly ITwitterClient _twitterClient;
+        readonly ITwitterPullClient _twitterClient;
         
-        public TwitterStreamQueries(ITwitterClient twitterClient)
+        public TwitterStreamQueries(ITwitterPullClient twitterClient)
         {
             _twitterClient = twitterClient;
         }
 
         public async Task GetFilteredStream(Action<string> processResult)
         {
-            var result = await _twitterClient.Get("tweets/search/stream?expansions=author_id");
+            var result = await _twitterClient.GetStream("tweets/search/stream?expansions=author_id");
 
             using (var reader = new StreamReader(result, null, true, -1,  true))
             {
-                try
+                while (!reader.EndOfStream)
                 {
-                    while (!reader.EndOfStream)
-                    {
-                        var readableString = reader.ReadLine();
-                        if(readableString.Length > 0)
-                            processResult.Invoke(readableString);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
+                    var readableString = reader.ReadLine();
+                    if(readableString.Length > 0)
+                        processResult.Invoke(readableString);
                 }
             }
         }

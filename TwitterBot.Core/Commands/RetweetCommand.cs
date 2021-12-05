@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using TwitterBot.Core.Clients.Twitter;
-using TwitterBot.Core.Helpers;
+﻿using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
+using TwitterBot.Core.Clients;
 
 namespace TwitterBot.Core.Commands
 {
@@ -10,10 +10,12 @@ namespace TwitterBot.Core.Commands
     }
     public class RetweetCommand : IRetweetCommand
     {
-        readonly ITwitterClient _twitterClient;
-        public RetweetCommand(ITwitterClient twitterClient)
+        readonly ITwitterPushClient _twitterClient;
+        readonly string _botUserId;
+        public RetweetCommand(ITwitterPushClient twitterClient, IConfiguration configuration)
         {
             _twitterClient = twitterClient;
+            _botUserId = configuration["Twitter:BotUserId"];
         }
 
         public Task Execute(string tweetId)
@@ -23,7 +25,7 @@ namespace TwitterBot.Core.Commands
                 tweet_id = tweetId
             };
 
-            return _twitterClient.Post($"users/{ConfigurationManager.AppSettings["Twitter:BotUserId"]}/retweets", retweetObj);
+            return _twitterClient.Post($"users/{_botUserId}/retweets", retweetObj, false);
         }
     }
 }
