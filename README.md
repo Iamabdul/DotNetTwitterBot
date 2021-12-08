@@ -16,5 +16,14 @@ This will then be copied and pasted into the appsettings.Json file [here](https:
 ## Pre condition
 In order for the listener to start listening to things, rules need to be set out first.
 Depending on when you'll see this, I'll be able to add this functionality to this bot so you don't have to set it up outside of this app.
-Just incase you need to know how to set up the rules, you can download the postman collection from twitter and follow the instructions. 
-It will only need ot be set once throughout the life of the account, so no worries on having to go back and forth 👍.
+
+## Rules Api
+The rules endpoints have now been added to the project, so you can now add and remove rules to the twitter api while the listener is running
+- Rules endpoint = "/rules" (for get/post and delete - delete endpoint takes a query param)
+- Post endpoint body = 
+```
+    {
+        "value": "#examplehashtag -is:retweet"
+    }
+```
+- Delete endpoint query param = "id={{RuleId}}"
