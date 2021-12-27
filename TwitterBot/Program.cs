@@ -11,4 +11,7 @@ var app = builder.Build();
 //Endpoints to expose
 app.MapEndpoints(); //extension
 
+if(app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
+
 app.Run();
